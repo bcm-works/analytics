@@ -1,9 +1,3 @@
-clickhouse/
-!clickhouse/logs.xml
-!clickhouse/ipv4-only.xml
-!clickhouse/low-resources.xml
-!clickhouse/default-profile-low-resources-overrides.xml
-
 .env
 .*.env
 .env.*
