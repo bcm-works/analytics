@@ -52,9 +52,9 @@ services:
       - bcm-analytics-plausible-data:/var/lib/plausible
     ports:
       # Use HTTP Port env variables or logical defaults
-      - "${HTTP_PORT_HOST:-8000}:${HTTP_PORT_CONT:-80}"
+      - "${HTTP_PORT:-8000}:${HTTP_PORT_CONT:-80}"
       # Use HTTPS Port env variables or create a duplicate line that Docker Compose will ignore
-      - "${HTTPS_PORT_HOST:-${HTTP_PORT_HOST}}:${HTTPS_PORT_HOST:-$HTTP_PORT_CONT}"
+      - "${HTTPS_PORT:-$HTTP_PORT}:${HTTPS_PORT:-80}"
     ulimits:
       nofile:
         soft: 65535
@@ -68,8 +68,8 @@ services:
       - HTTP_PORT
       - HTTPS_PORT
       # Google: https://github.com/plausible/community-edition/wiki/configuration#google
-      - GOOGLE_CLIENT_ID
-      - GOOGLE_CLIENT_SECRET
+      # - GOOGLE_CLIENT_ID
+      # - GOOGLE_CLIENT_SECRET
 
 volumes:
   bcm-analytics-db-data:
