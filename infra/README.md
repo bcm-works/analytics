@@ -28,10 +28,10 @@ Apply the following one-off configuration in the Railway dashboard:
    - `clickhouse` → `docker/ServiceClickHouse.Dockerfile`
    - `plausible` → `docker/ServicePlausible.Dockerfile`
 
-2. **`BASE_URL`** — after the first deploy of the `plausible` service, copy its
-   Railway-generated domain and set it as a variable:
+2. **`BASE_URL`** — after the first deploy of the `plausible` service, create a new
+   Railway-generated public domain (point to port 8000), then set it as a variable:
    ```bash
-   railway variable set --service plausible BASE_URL=https://analytics-production-xxxx.up.railway.app
+   railway variable set --service plausible BASE_URL=http://example-xxxx-yyyy.up.railway.app
    ```
 
 3. **`SECRET_KEY_BASE`** — generate a secret and set it as a variable:
