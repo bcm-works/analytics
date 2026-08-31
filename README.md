@@ -1,8 +1,8 @@
 # Site Analytics
 
-Custom site analytics based on [Plausible CE v3.2.1](https://github.com/plausible/community-edition).
+Custom site analytics based on [Plausible CE v3.2.1](https://github.com/plausible/community-edition/tree/v3.2.1).
 
-> This document has been altered in this fork, also refer to [Plausible's readme](https://github.com/plausible/community-edition/blob/v3.2.1/README.md).__
+> This document has been altered in this fork, also refer to [Plausible's readme](https://github.com/plausible/community-edition/blob/v3.2.1/README.md).
 
 ## Requirements
 
