@@ -11,10 +11,10 @@ Customised [Plausible CE v3.2.1](https://github.com/plausible/community-edition/
 
 ## Requirements
 
-- **[Docker](https://docs.docker.com/engine/install/)**
-- **[Docker Compose](https://docs.docker.com/compose/install/)**
-- **CPU** must support **SSE 4.2** or **NEON** instruction set or higher
-- At least **2 GB of RAM**
+- [Docker](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- **CPU**: Must support **SSE 4.2** or **NEON** instruction set or higher
+- **RAM**: At least 2GB
 
 ## Initial Setup
 
