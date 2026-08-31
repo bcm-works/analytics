@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-REPO="$(cd "$(dirname "$0")" && pwd)"
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$REPO"
 
-bash "$REPO/stop.sh"
+bash "$REPO/bin/stop.sh"
 
 ENVFILE="$REPO/.env"
 if [ -f "$ENVFILE" ]; then
