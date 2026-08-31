@@ -17,7 +17,7 @@ All commands shown below must be run from a terminal in this `infra` directory.
 - Install the [Node](https://nodejs.org/) version defined in [.nvmrc](.nvmrc), one option is to use my [Node setup script](https://github.com/bcm-works/dotfiles/blob/main/dev/node.sh)
 - Install the [Railway CLI](https://docs.railway.com/cli#installing-the-cli)
 - Install dependencies: `npm install`
-- Login to your Railway account: `npm run login`
+- Configure the Railway CLI and link your account: `npm run setup`
 - Check [.railway/railway.ts](.railway/railway.ts) and confirm `GITHUB_REPO` is set to the correct GitHub `owner/repo` value
 - Create the initial infra in your Railway account: `railway config apply`
 
@@ -41,8 +41,8 @@ Apply the following one-off configuration in the Railway dashboard:
 
 ## Commands
 
+- `npm run setup` - Configure the Railway CLI and link your account
 - `npm run apply` - Preview and apply changes after confirmation
-- `npm run login` - Login and link account
 - `npm run plan` - Preview changes without applying them
 - `npm run pull` - Import current Railway state into `railway.ts`
 

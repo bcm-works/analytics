@@ -6,7 +6,7 @@
     "railway": "latest"
   },
   "scripts": {
-    "login": "railway login && railway link",
+    "setup": "railway telemetry disable && railway login && railway link",
     "apply": "railway config apply",
     "plan": "railway config plan",
     "pull": "railway config pull"
