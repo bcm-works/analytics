@@ -9,7 +9,7 @@
     "setup": "railway telemetry disable && railway login && railway link",
     "apply": "railway config apply",
     "plan": "railway config plan",
-    "pull": "railway config pull"
+    "pull": "railway config pull --force"
   },
   "packageManager": "npm@12.0.2",
   "engines": {

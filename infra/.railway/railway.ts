@@ -1,83 +1,28 @@
-import {
-  defineRailway,
-  github,
-  postgres,
-  preserve,
-  project,
-  service,
-  volume,
-} from "railway/iac";
-
-const GITHUB_REPO = "bcm-works/analytics";
+import { defineRailway, github, postgres, preserve, project, service, volume } from "railway/iac";
 
 export default defineRailway(() => {
-  // -------------------------------------------------------------------------
-  // PostgreSQL - managed by Railway; DATABASE_URL is exposed automatically
-  // -------------------------------------------------------------------------
-  const db = postgres("postgres");
+  const analytics = github("bcm-works/analytics", { checkSuites: false });
 
-  // -------------------------------------------------------------------------
-  // Volumes
-  // -------------------------------------------------------------------------
-  const clickhouseData = volume("clickhouse-data", {
-    sizeMB: 250,
-  });
-
-  const plausibleData = volume("plausible-data", {
-    sizeMB: 250,
-  });
-
-  // -------------------------------------------------------------------------
-  // ClickHouse - private only (no public domain)
-  // Dockerfile: docker/ServiceClickHouse.Dockerfile  (set in Railway settings)
-  // Internal hostname: clickhouse.railway.internal:8123
-  // -------------------------------------------------------------------------
+  const postgresDatabase = postgres("postgres", { region: "ams" });
+  const plausibleData = volume("plausible-data", { alerts: { usage: { "100": {}, "80": {}, "95": {} } }, allowOnlineResize: true, region: "ams", sizeMB: 250 });
+  const postgresVolumeEFwE = volume("postgres-volume-eFwE", { alerts: { usage: { "100": {}, "80": {}, "95": {} } }, allowOnlineResize: true, region: "ams", sizeMB: 500 });
+  const clickhouseData = volume("clickhouse-data", { alerts: { usage: { "100": {}, "80": {}, "95": {} } }, allowOnlineResize: true, region: "ams", sizeMB: 250 });
   const clickhouse = service("clickhouse", {
-    source: github(GITHUB_REPO),
-    env: {
-      CLICKHOUSE_SKIP_USER_SETUP: "1",
-    },
-    volumeMounts: {
-      "/var/lib/clickhouse": clickhouseData,
-    },
+    source: analytics,
+    build: { buildEnvironment: "V3", builder: "DOCKERFILE", dockerfilePath: "/docker/ServiceClickHouse.Dockerfile" },
+    replicas: { "ams": 1 },
+    volumeMounts: { "/var/lib/clickhouse": clickhouseData },
+    env: { CLICKHOUSE_SKIP_USER_SETUP: preserve() },
   });
-
-  // -------------------------------------------------------------------------
-  // Plausible - public-facing analytics app
-  // Dockerfile: docker/ServicePlausible.Dockerfile  (set in Railway settings)
-  // After first deploy, copy the Railway-generated domain into BASE_URL.
-  // -------------------------------------------------------------------------
   const plausible = service("plausible", {
-    source: github(GITHUB_REPO),
-    env: {
-      // Set this to the Railway-generated domain after the first deploy,
-      // e.g. https://analytics-production-xxxx.up.railway.app
-      BASE_URL: preserve(),
-
-      // Generate locally: openssl rand -base64 48
-      SECRET_KEY_BASE: preserve(),
-
-      // Linked reference variable - auto-updates if the credential rotates
-      DATABASE_URL: db.env.DATABASE_URL,
-
-      // ClickHouse private network address (service name = "clickhouse")
-      CLICKHOUSE_DATABASE_URL:
-        "http://clickhouse.railway.internal:8123/plausible_events",
-
-      HTTP_PORT: "8000",
-    },
-    volumeMounts: {
-      "/var/lib/plausible": plausibleData,
-    },
+    source: analytics,
+    build: { buildEnvironment: "V3", builder: "DOCKERFILE", dockerfilePath: "/docker/ServicePlausible.Dockerfile" },
+    replicas: { "ams": 1 },
+    volumeMounts: { "/var/lib/plausible": plausibleData },
+    env: { BASE_URL: preserve(), CLICKHOUSE_DATABASE_URL: preserve(), DATABASE_URL: preserve(), HTTP_PORT: preserve(), SECRET_KEY_BASE: preserve() },
   });
 
   return project("analytics", {
-    resources: [
-      db,
-      clickhouseData,
-      plausibleData,
-      clickhouse,
-      plausible,
-    ],
+    resources: [clickhouse, postgresDatabase, plausible, plausibleData, postgresVolumeEFwE, clickhouseData],
   });
 });
