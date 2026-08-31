@@ -14,10 +14,11 @@ All commands shown below must be run from a terminal in this `infra` directory.
 
 ## Initial Setup
 
-- Install [Node](https://nodejs.org/) 26.8, one method is my [Node setup script](https://github.com/bcm-works/dotfiles/blob/main/dev/node.sh)
-- Install Node dependencies: `npm install`
-- Login to your Railway account: `railway login && railway link`
-- Check `railway.ts` and confirm `GITHUB_REPO` is set to the correct GitHub `owner/repo` value
+- Install the [Node](https://nodejs.org/) version defined in [.nvmrc](.nvmrc), one option is to use my [Node setup script](https://github.com/bcm-works/dotfiles/blob/main/dev/node.sh)
+- Install the [Railway CLI](https://docs.railway.com/cli#installing-the-cli)
+- Install dependencies: `npm install`
+- Login to your Railway account: `npm run login`
+- Check [.railway/railway.ts](.railway/railway.ts) and confirm `GITHUB_REPO` is set to the correct GitHub `owner/repo` value
 - Create the initial infra in your Railway account: `railway config apply`
 
 Apply the following one-off configuration in the Railway dashboard:
@@ -40,9 +41,10 @@ Apply the following one-off configuration in the Railway dashboard:
 
 ## Commands
 
-- `railway config plan` - Preview changes without applying them
-- `railway config apply` - Preview and apply changes after confirmation
-- `railway config pull` - Import current Railway state into `railway.ts`
+- `npm run apply` - Preview and apply changes after confirmation
+- `npm run login` - Login and link account
+- `npm run plan` - Preview changes without applying them
+- `npm run pull` - Import current Railway state into `railway.ts`
 
 ## Scaling and Resource Limits
 
