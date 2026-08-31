@@ -33,8 +33,8 @@ ClickHouse cannot use Railway's volume mounts the same way Docker Compose does, 
 ## Step 3 — Deploy ClickHouse
 
 1. Click **+ New** → **GitHub Repo** and select this repository.
-2. In the service settings, set the **Root Directory** to `clickhouse`.
-3. Railway will detect `clickhouse/Dockerfile` and use it to build the image.
+2. In the service settings, set the **Root Directory** to `/`.
+3. Railway will detect `Clickhouse.Dockerfile` and use it to build the image.
 4. Under **Settings → Networking**, add a **Private Networking** port: `8123` (HTTP). Do **not** expose this publicly.
 5. Rename the service to `clickhouse` (used to form the internal hostname).
 6. Under **Variables**, add:
@@ -115,7 +115,7 @@ Push changes to GitHub — Railway redeploys automatically on new commits.
 
 ### Updating ClickHouse config
 
-Edit the XML files in `clickhouse/`, push to GitHub, and Railway will rebuild the `clickhouse` service image.
+Edit the XML files in `clickhouse`, push to GitHub, and Railway will rebuild the `clickhouse` service image.
 
 ### Scaling and resource limits
 
