@@ -20,11 +20,11 @@ export default defineRailway(() => {
   // Volumes
   // -------------------------------------------------------------------------
   const clickhouseData = volume("clickhouse-data", {
-    sizeMB: 10240, // 10 GB - adjust to your traffic needs
+    sizeMB: 250,
   });
 
   const plausibleData = volume("plausible-data", {
-    sizeMB: 1024, // 1 GB
+    sizeMB: 250,
   });
 
   // -------------------------------------------------------------------------
