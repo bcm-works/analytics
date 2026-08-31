@@ -17,7 +17,7 @@ services:
     container_name: bcm-analytics-events-db
     build:
       context: .
-      dockerfile: Clickhouse.Dockerfile
+      dockerfile: ServiceClickHouse.Dockerfile
     restart: always
     volumes:
       - bcm-analytics-event-data:/var/lib/clickhouse
@@ -38,9 +38,10 @@ services:
 
   plausible:
     container_name: bcm-analytics-app
-    image: ghcr.io/plausible/community-edition:v3.2.1
+    build:
+      context: .
+      dockerfile: ServicePlausible.Dockerfile
     restart: always
-    command: sh -c "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
     depends_on:
       plausible_db:
         condition: service_healthy
@@ -58,11 +59,8 @@ services:
         soft: 65535
         hard: 65535
     environment:
-      - TMPDIR=/var/lib/plausible/tmp
       - BASE_URL=${BASE_URL}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
-      - DISABLE_REGISTRATION=true
-      - ENABLE_EMAIL_VERIFICATION=false
       - HTTP_PORT
       - HTTPS_PORT
 

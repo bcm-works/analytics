@@ -3,11 +3,11 @@
 Customised [Plausible CE v3.2.1](https://github.com/plausible/community-edition/tree/v3.2.1) including:
 
 - User registration disabled
-- User setup via 
+- User setup via [bin/create-user.sh](bin/create-user.sh)
 - Email features disabled
-- 
+- Customised Docker config
 
-> This document has been altered in this fork, also refer to [Plausible's readme](https://github.com/plausible/community-edition/blob/v3.2.1/README.md).
+> This document has been altered in this fork. Refer to [Plausible's Readme](https://github.com/plausible/community-edition/blob/v3.2.1/README.md) for official documentation.
 
 ## Requirements
 
@@ -44,10 +44,10 @@ Three Railway services make up the stack:
 | Service | Type | Notes |
 |---|---|---|
 | **postgres** | Railway PostgreSQL plugin | Managed by Railway |
-| **clickhouse** | Docker service (custom Dockerfile) | Built from `infra/Dockerfile` |
-| **plausible** | Docker image service | Pre-built image from GHCR |
+| **clickhouse** | Docker service (custom Dockerfile) | Built from `ServiceClickHouse.Dockerfile` |
+| **plausible** | Docker service (custom Dockerfile) | Built from `ServicePlausible.Dockerfile` |
 
-ClickHouse cannot use Railway's volume mounts the same way Docker Compose does, so `infra/Dockerfile` bakes the XML config files directly into the image.
+Both ClickHouse and Plausible use custom Dockerfiles. ClickHouse bakes its XML config directly into the image (Railway volume mounts can't replicate the bind-mount approach used locally). Plausible's Dockerfile bakes in non-secret defaults (`DISABLE_REGISTRATION`, `ENABLE_EMAIL_VERIFICATION`, `TMPDIR`) so Railway only needs secret and connection-string variables.
 
 ### Prerequisites
 
@@ -69,7 +69,7 @@ ClickHouse cannot use Railway's volume mounts the same way Docker Compose does, 
 
 1. Click **+ New** → **GitHub Repo** and select this repository.
 2. In the service settings, set the **Root Directory** to `/`.
-3. Railway will detect `Clickhouse.Dockerfile` and use it to build the image.
+3. Under **Settings → Build**, set the **Dockerfile Path** to `ServiceClickHouse.Dockerfile`.
 4. Under **Settings → Networking**, add a **Private Networking** port: `8123` (HTTP). Do **not** expose this publicly.
 5. Rename the service to `clickhouse` (used to form the internal hostname).
 6. Under **Variables**, add:
@@ -83,19 +83,14 @@ ClickHouse cannot use Railway's volume mounts the same way Docker Compose does, 
 
 ### Step 4 — Deploy Plausible
 
-1. Click **+ New** → **Docker Image** and enter:
-   ```
-   ghcr.io/plausible/community-edition:v3.2.1
-   ```
-2. Under **Settings → Deploy**, set the **Start Command** to:
-   ```
-   sh -c "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
-   ```
-3. Under **Settings → Networking**:
+1. Click **+ New** → **GitHub Repo** and select this repository.
+2. In the service settings, set the **Root Directory** to `/`.
+3. Under **Settings → Build**, set the **Dockerfile Path** to `ServicePlausible.Dockerfile`.
+4. Under **Settings → Networking**:
    - Set the **Private port** to `8000`.
    - Click **Generate Domain** to get a public HTTPS URL (e.g. `https://analytics-production-xxxx.up.railway.app`). Note this URL — you will use it for `BASE_URL`.
-4. Under **Settings → Deploy**, add a **Volume** mounted at `/var/lib/plausible` for persistent data.
-5. Rename the service to `plausible`.
+5. Under **Settings → Deploy**, add a **Volume** mounted at `/var/lib/plausible` for persistent data.
+6. Rename the service to `plausible`.
 
 #### Environment variables
 
@@ -108,9 +103,8 @@ Add the following variables to the **plausible** service under **Variables**:
 | `DATABASE_URL` | Click **+ Add Reference** → select the PostgreSQL service → `DATABASE_URL` |
 | `CLICKHOUSE_DATABASE_URL` | `http://clickhouse.railway.internal:8123/plausible_events` |
 | `HTTP_PORT` | `8000` |
-| `DISABLE_REGISTRATION` | `true` |
-| `ENABLE_EMAIL_VERIFICATION` | `false` |
-| `TMPDIR` | `/var/lib/plausible/tmp` |
+
+> **Note:** `DISABLE_REGISTRATION`, `ENABLE_EMAIL_VERIFICATION`, and `TMPDIR` are baked into `ServicePlausible.Dockerfile` and do not need to be set here.
 
 > **Note:** `DATABASE_URL` should be added as a Railway [reference variable](https://docs.railway.com/guides/variables#referencing-another-services-variable) — do not copy the value directly, as it may rotate.
 
@@ -129,8 +123,6 @@ railway run --service plausible -- \
 
 Replace the name, email, and password with your credentials, then store them in your password manager.
 
-After the user is created, redeploy the `plausible` service (the run command re-runs migrations on each start, so no special action is needed beyond the deploy).
-
 ### Step 6 — Verify
 
 1. Visit your `BASE_URL` in a browser.
@@ -145,12 +137,12 @@ Push changes to GitHub, Railway redeploys automatically on new commits.
 
 #### Updating Plausible
 
-1. Change the Docker image tag in the Railway service settings (e.g. `v3.3.0`).
-2. Railway will pull the new image; the start command re-runs migrations automatically on startup.
+1. Change the `FROM` tag in `ServicePlausible.Dockerfile` (e.g. to `v3.3.0`).
+2. Push to GitHub — Railway rebuilds the image and re-runs migrations automatically on startup.
 
 #### Updating ClickHouse config
 
-Edit the XML files in `clickhouse`, push to GitHub, and Railway will rebuild the `clickhouse` service image.
+Edit the XML files in `clickhouse/`, push to GitHub, and Railway will rebuild the `clickhouse` service image.
 
 #### Scaling and resource limits
 
