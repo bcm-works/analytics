@@ -8,3 +8,5 @@
 !LICENSE
 !.gitignore
 !.sample.env
+!start.sh
+!stop.sh

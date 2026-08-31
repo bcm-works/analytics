@@ -16,5 +16,10 @@ Custom site analytics based on [Plausible CE v3.2.1](https://github.com/plausibl
 - Generate a new secret key: `openssl rand -base64 48`
 - Edit `.env` and set the value of `SECRET_KEY_BASE` variable to the secret key value
 - Add suitable values for the other variables in `.env`
-- Start the services with Docker Compose: `docker compose up -d`
+- Start the services with Docker Compose: `bash ./start.sh`
 - Visit your instance at `$BASE_URL` and create the first user.
+
+## Commands
+
+- `bash ./start.sh`: Start the services with Docker Compose
+- `bash ./stop.sh`: Stop the services with Docker Compose
