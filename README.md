@@ -38,25 +38,21 @@ Customised [Plausible CE v3.2.1](https://github.com/plausible/community-edition/
 
 This section covers deploying this app to [Railway](https://railway.com/).
 
-### Architecture
-
 Three Railway services make up the stack:
 
 | Service | Type | Notes |
 |---|---|---|
 | **postgres** | Railway PostgreSQL plugin | Managed by Railway |
-| **clickhouse** | Docker service (custom Dockerfile) | Built from `docker/ServiceClickHouse.Dockerfile` |
-| **plausible** | Docker service (custom Dockerfile) | Built from `docker/ServicePlausible.Dockerfile` |
-
-Both ClickHouse and Plausible use custom Dockerfiles. ClickHouse bakes its XML config directly into the image (Railway volume mounts can't replicate the bind-mount approach used locally). Plausible's Dockerfile bakes in non-secret defaults (`DISABLE_REGISTRATION`, `ENABLE_EMAIL_VERIFICATION`, `TMPDIR`) so Railway only needs secret and connection-string variables.
+| **clickhouse** | Docker service (custom Dockerfile) | Built from [ServiceClickHouse.Dockerfile](docker/ServiceClickHouse.Dockerfile) |
+| **plausible** | Docker service (custom Dockerfile) | Built from [ServicePlausible.Dockerfile](docker/ServicePlausible.Dockerfile) |
 
 ### Requirements
 
 - A [Railway](https://railway.com/) account using a Hobby plan or higher, as the free tier does not support persistent volumes
 - The [Railway CLI](https://docs.railway.com/guides/cli) installed and authenticated: `railway login`
-- This repository pushed to GitHub (Railway deploys from a Git repo)
+- The repository pushed to GitHub, deployment triggers default to pushes to the default branch
 
-### Step 1: Create a Railway project
+### Step 1: New Railway project
 
 1. In the Railway dashboard, click **New Project**.
 2. Choose **Empty project** and give it a name (e.g. `analytics`).
@@ -134,7 +130,7 @@ Replace the name, email, and password with your credentials, then store them in 
 
 #### Redeploying
 
-Push changes to GitHub, Railway redeploys automatically on new commits.
+Push changes to GitHub, Railway redeploys automatically on new commits to the default branch.
 
 #### Updating Plausible
 
