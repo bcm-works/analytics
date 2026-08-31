@@ -1,9 +1,12 @@
+name: bcm-analytics
+
 services:
   plausible_db:
+    container_name: bcm-analytics-db
     image: postgres:16-alpine
     restart: always
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - bcm-analytics-db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=postgres
     healthcheck:
@@ -11,17 +14,14 @@ services:
       start_period: 1m
 
   plausible_events_db:
+    container_name: bcm-analytics-events-db
     image: clickhouse/clickhouse-server:24.12-alpine
     restart: always
     volumes:
-      - event-data:/var/lib/clickhouse
-      - event-logs:/var/log/clickhouse-server
+      - bcm-analytics-event-data:/var/lib/clickhouse
+      - bcm-analytics-event-logs:/var/log/clickhouse-server
       - ./clickhouse/logs.xml:/etc/clickhouse-server/config.d/logs.xml:ro
-      # This makes ClickHouse bind to IPv4 only, since Docker doesn't enable IPv6 in bridge networks by default.
-      # Fixes "Listen [::]:9000 failed: Address family for hostname not supported" warnings.
       - ./clickhouse/ipv4-only.xml:/etc/clickhouse-server/config.d/ipv4-only.xml:ro
-      # The following configuration files make ClickHouse consume less resources, which is useful for small setups.
-      # https://clickhouse.com/docs/en/operations/tips#using-less-than-16gb-of-ram
       - ./clickhouse/low-resources.xml:/etc/clickhouse-server/config.d/low-resources.xml:ro
       - ./clickhouse/default-profile-low-resources-overrides.xml:/etc/clickhouse-server/users.d/default-profile-low-resources-overrides.xml:ro
     ulimits:
@@ -39,6 +39,7 @@ services:
       start_period: 1m
 
   plausible:
+    container_name: bcm-analytics-app
     image: ghcr.io/plausible/community-edition:v3.2.1
     restart: always
     command: sh -c "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
@@ -48,10 +49,12 @@ services:
       plausible_events_db:
         condition: service_healthy
     volumes:
-      - plausible-data:/var/lib/plausible
+      - bcm-analytics-plausible-data:/var/lib/plausible
     ports:
-      - ${HTTP_PORT:-80}:80
-      - ${HTTPS_PORT:-443}:443
+      # Use 'HTTP_PORT' or default to '8000'
+      - "${HTTP_PORT:-8000}:80"
+      # Use 'HTTPS_PORT' or create a duplicate line that Docker Compose will ignore
+      - "${HTTPS_PORT:-${HTTP_PORT}}:${HTTPS_PORT:-80}"
     ulimits:
       nofile:
         soft: 65535
@@ -69,7 +72,7 @@ services:
       - GOOGLE_CLIENT_SECRET
 
 volumes:
-  db-data:
-  event-data:
-  event-logs:
-  plausible-data:
+  bcm-analytics-db-data:
+  bcm-analytics-event-data:
+  bcm-analytics-event-logs:
+  bcm-analytics-plausible-data:
