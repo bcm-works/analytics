@@ -17,7 +17,7 @@ services:
     container_name: bcm-analytics-events-db
     build:
       context: .
-      dockerfile: ServiceClickHouse.Dockerfile
+      dockerfile: docker/ServiceClickHouse.Dockerfile
     restart: always
     volumes:
       - bcm-analytics-event-data:/var/lib/clickhouse
@@ -40,7 +40,7 @@ services:
     container_name: bcm-analytics-app
     build:
       context: .
-      dockerfile: ServicePlausible.Dockerfile
+      dockerfile: docker/ServicePlausible.Dockerfile
     restart: always
     depends_on:
       plausible_db:

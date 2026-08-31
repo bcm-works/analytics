@@ -11,9 +11,10 @@ Customised [Plausible CE v3.2.1](https://github.com/plausible/community-edition/
 
 ## Requirements
 
-- **[Docker](https://docs.docker.com/engine/install/)** and **[Docker Compose](https://docs.docker.com/compose/install/)** must be installed on your machine.
-- **CPU** must support **SSE 4.2** or **NEON** instruction set or higher (required by ClickHouse).
-- At least **2 GB of RAM** is recommended for running ClickHouse and Plausible without fear of OOMs.
+- **[Docker](https://docs.docker.com/engine/install/)**
+- **[Docker Compose](https://docs.docker.com/compose/install/)**
+- **CPU** must support **SSE 4.2** or **NEON** instruction set or higher
+- At least **2 GB of RAM**
 
 ## Initial Setup
 
@@ -44,8 +45,8 @@ Three Railway services make up the stack:
 | Service | Type | Notes |
 |---|---|---|
 | **postgres** | Railway PostgreSQL plugin | Managed by Railway |
-| **clickhouse** | Docker service (custom Dockerfile) | Built from `ServiceClickHouse.Dockerfile` |
-| **plausible** | Docker service (custom Dockerfile) | Built from `ServicePlausible.Dockerfile` |
+| **clickhouse** | Docker service (custom Dockerfile) | Built from `docker/ServiceClickHouse.Dockerfile` |
+| **plausible** | Docker service (custom Dockerfile) | Built from `docker/ServicePlausible.Dockerfile` |
 
 Both ClickHouse and Plausible use custom Dockerfiles. ClickHouse bakes its XML config directly into the image (Railway volume mounts can't replicate the bind-mount approach used locally). Plausible's Dockerfile bakes in non-secret defaults (`DISABLE_REGISTRATION`, `ENABLE_EMAIL_VERIFICATION`, `TMPDIR`) so Railway only needs secret and connection-string variables.
 
@@ -69,7 +70,7 @@ Both ClickHouse and Plausible use custom Dockerfiles. ClickHouse bakes its XML c
 
 1. Click **+ New** → **GitHub Repo** and select this repository.
 2. In the service settings, set the **Root Directory** to `/`.
-3. Under **Settings → Build**, set the **Dockerfile Path** to `ServiceClickHouse.Dockerfile`.
+3. Under **Settings → Build**, set the **Dockerfile Path** to `docker/ServiceClickHouse.Dockerfile`.
 4. Under **Settings → Networking**, add a **Private Networking** port: `8123` (HTTP). Do **not** expose this publicly.
 5. Rename the service to `clickhouse` (used to form the internal hostname).
 6. Under **Variables**, add:
@@ -85,7 +86,7 @@ Both ClickHouse and Plausible use custom Dockerfiles. ClickHouse bakes its XML c
 
 1. Click **+ New** → **GitHub Repo** and select this repository.
 2. In the service settings, set the **Root Directory** to `/`.
-3. Under **Settings → Build**, set the **Dockerfile Path** to `ServicePlausible.Dockerfile`.
+3. Under **Settings → Build**, set the **Dockerfile Path** to `docker/ServicePlausible.Dockerfile`.
 4. Under **Settings → Networking**:
    - Set the **Private port** to `8000`.
    - Click **Generate Domain** to get a public HTTPS URL (e.g. `https://analytics-production-xxxx.up.railway.app`). Note this URL: you will use it for `BASE_URL`.
@@ -104,7 +105,7 @@ Add the following variables to the **plausible** service under **Variables**:
 | `CLICKHOUSE_DATABASE_URL` | `http://clickhouse.railway.internal:8123/plausible_events` |
 | `HTTP_PORT` | `8000` |
 
-> **Note:** `DISABLE_REGISTRATION`, `ENABLE_EMAIL_VERIFICATION`, and `TMPDIR` are baked into `ServicePlausible.Dockerfile` and do not need to be set here.
+> **Note:** `DISABLE_REGISTRATION`, `ENABLE_EMAIL_VERIFICATION`, and `TMPDIR` are baked into `docker/ServicePlausible.Dockerfile` and do not need to be set here.
 
 > **Note:** `DATABASE_URL` should be added as a Railway [reference variable](https://docs.railway.com/guides/variables#referencing-another-services-variable), do not copy the value directly, as it may rotate.
 
@@ -137,7 +138,7 @@ Push changes to GitHub, Railway redeploys automatically on new commits.
 
 #### Updating Plausible
 
-1. Change the version in the `FROM` line in `ServicePlausible.Dockerfile`
+1. Change the version in the `FROM` line in `docker/ServicePlausible.Dockerfile`
 2. Push to GitHub, Railway rebuilds the image and re-runs migrations automatically on startup.
 
 #### Updating ClickHouse config

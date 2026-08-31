@@ -3,7 +3,7 @@
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-bash "$REPO/bin/stop.sh" > /dev/null 2>&1
+bash "$REPO/bin/stop.sh"
 
 ENVFILE="$REPO/.env"
 if [ -f "$ENVFILE" ]; then
@@ -14,4 +14,7 @@ else
 fi
 
 echo "Starting Docker containers"
-docker compose --project-directory "$REPO" up -d > /dev/null 2>&1
+docker compose \
+  --project-directory "$REPO" \
+  --file "$REPO/docker/docker-compose.yml" \
+  up -d > /dev/null 2>&1

@@ -3,4 +3,8 @@
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-docker compose --project-directory "$REPO" down || true
+echo "Stopping Docker containers"
+docker compose \
+  --project-directory "$REPO" \
+  --file "$REPO/docker/docker-compose.yml" \
+  down > /dev/null 2>&1 || true
