@@ -12,4 +12,4 @@ else
   echo "No env file found, relying on system environment vars."
 fi
 
-docker compose up -d
+docker compose --project-directory "$REPO" up -d

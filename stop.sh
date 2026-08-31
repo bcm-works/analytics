@@ -2,4 +2,4 @@
 
 REPO="$(cd "$(dirname "$0")" && pwd)"
 
-docker compose down || true
+docker compose --project-directory "$REPO" down || true

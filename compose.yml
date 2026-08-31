@@ -51,10 +51,10 @@ services:
     volumes:
       - bcm-analytics-plausible-data:/var/lib/plausible
     ports:
-      # Use HTTP Port env variables or logical defaults
-      - "${HTTP_PORT:-8000}:80"
-      # Use HTTPS Port env variables or create a duplicate line that Docker Compose will ignore
-      - "${HTTPS_PORT:-$HTTP_PORT}:${HTTPS_PORT_CONT:-80}"
+      # Use HTTP_PORT env variable or default to 8000 (host:container — Plausible binds to HTTP_PORT inside the container)
+      - "${HTTP_PORT:-8000}:${HTTP_PORT:-8000}"
+      # When HTTPS_PORT is set, expose it; otherwise duplicate the HTTP mapping so Docker Compose ignores it
+      - "${HTTPS_PORT:-8000}:${HTTPS_PORT_CONT:-${HTTPS_PORT:-8000}}"
     ulimits:
       nofile:
         soft: 65535
